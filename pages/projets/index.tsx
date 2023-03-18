@@ -2,20 +2,18 @@ import React from "react";
 import CardProject from "../../components/CardProjet/CardProject";
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import pool from "../../lib/db";
-
 interface Projets {
   id: number;
   title: string;
   description: string;
   client: string;
   annee: number;
-  urlImage: string;
 }
 
 export const getStaticProps: GetStaticProps<{ projects: Projets[] }> = async () => {
   try {
     const client = await pool.connect();
-    const result = await client.query("SELECT * FROM test");
+    const result = await client.query("SELECT id, title, description, client, annee FROM test");
     const projects = result.rows;
     client.release();
     return {
@@ -39,14 +37,13 @@ export default function Projets({ projects }: ProjectsProps) {
   return (
     <section>
       <h1>Projets</h1>
-      <div className="projects-list" style={{display:"flex"}}>
+      <div className="projects-list" style={{display:"flex", flexWrap:"wrap"}}>
         {projects.map((project) => (
           <CardProject
             key={project.id}
             id={project.id}
             title={project.title}
             description={project.description}
-            urlImage={project.urlImage}
             client={project.client}
             annee={project.annee}
           />

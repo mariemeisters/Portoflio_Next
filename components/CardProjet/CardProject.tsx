@@ -1,5 +1,4 @@
 import React from "react";
-import Image from 'next/image'
 import classes from './CardProject.module.css';
 //import { useRouter } from "next/router";
 import Link from "next/link";
@@ -9,18 +8,30 @@ import Link from "next/link";
 interface CardProjectProps {
   id: number;
   title: string;
-  urlImage: string;
   description: string;
   client: string;
   annee: number;
 }
 
-function CardProject({ id, title, urlImage, description, annee }: CardProjectProps) {
-  let imageUrl = "";
+function CardProject({ id, title, description, client, annee }: CardProjectProps) {
+  
 
-  if (urlImage) {
-    imageUrl = urlImage.replace("dl=0", "raw=1");
-  }
+  return (
+    <Link legacyBehavior href={`/projets/${title}`}>
+      <a className={classes.CardProject}>
+        <article>
+          <h3>{title}</h3>
+          <p>{description}</p>
+          <p>{client}</p>
+        </article>
+      </a>
+    </Link>
+  );
+}
+
+export default CardProject;
+
+
   //variable
  // const router = useRouter();
   
@@ -32,21 +43,3 @@ function CardProject({ id, title, urlImage, description, annee }: CardProjectPro
   //     }
   //   })
   // }     //onClick={cardCliquedHandler}
-
-
-  return (
-    <Link legacyBehavior href={{
-      pathname: `/projets/${title}`,
-      }}>
-    <a className={classes.CardProject}>
-      <article>
-      <Image src={imageUrl} alt={title} />
-      <h3>{title}</h3>
-      <p>{description}</p>
-      </article>
-    </a>
-    </Link>
-  );
-}
-
-export default CardProject;
