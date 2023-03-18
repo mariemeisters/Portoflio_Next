@@ -31,7 +31,6 @@ function CardProject({ id, title, description, client, annee }: CardProjectProps
 
 export default CardProject;
 
-
   //variable
  // const router = useRouter();
   

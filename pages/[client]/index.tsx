@@ -2,8 +2,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import CardProject from "../../components/CardProjet/CardProject";
 import FiltreAnnee from "../../components/FiltreAnnee/FiltreAnnee";
-import { GetStaticProps } from "next";
-import pool from "../../lib/db";
+import pool, { getAllClients } from "../../lib/db";
 
 interface Projets {
   id: number;
@@ -13,12 +12,17 @@ interface Projets {
   annee: number;
 }
 
-export const getStaticProps: GetStaticProps<{ projects: Projets[] }> = async ({ params }) => {
-  try {
+interface ProjectsProps {
+  projects: Projets[];
+  annee: number;
+}
+
+export const getStaticProps = async ({ params }: { params: { [key: string]: string } }) => {
+    try {
     const client = await pool.connect();
     const result = await client.query(
       "SELECT id, title, description, client, annee FROM test WHERE client = $1",
-      [params?.client]
+      [params.client]
     );
     const projects = result.rows;
     client.release();
@@ -35,40 +39,34 @@ export const getStaticProps: GetStaticProps<{ projects: Projets[] }> = async ({ 
   }
 };
 
-interface ProjectsProps {
-  projects: Projets[];
-}
-
 export async function getStaticPaths() {
+  const clients = await getAllClients();
+  const paths = clients.map((client) => ({ params: { client } }));
   return {
-    paths: [
-      { params: { client: 'formation' } },
-      { params: { client: 'perso' } }
-    ],
-    fallback: false
-  }
+    paths,
+    fallback: false,
+  };
 }
 
-
-export default function ProjetDuClient({ projects }: ProjectsProps) {
+export default function ProjetsDuClient({ projects }: ProjectsProps) {
   const router = useRouter();
   const client = router.query.client as string;
+  const annee = router.query.annee as unknown as number;
   const nomDuClient = client === "perso" ? "Projets personnels" : `Projets de ${client}`;
   
   return (
     <section>
       <h1>{nomDuClient}</h1>
-      <FiltreAnnee client={client} />
-
+      <FiltreAnnee client={client} annee={annee} />
       <div className="projects-list">
-        {projects.map((project) => (
+        {projects.map((Allproject) => (
           <CardProject
-            key={project.id}
-            id={project.id}
-            title={project.title}
-            description={project.description}
-            client={project.client}
-            annee={project.annee}
+            key={Allproject.id}
+            id={Allproject.id}
+            title={Allproject.title}
+            description={Allproject.description}
+            client={Allproject.client}
+            annee={Allproject.annee}
           />
         ))}
       </div>

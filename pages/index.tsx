@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import Head from "next/head";
+import { MyNextApiRequest } from "../types/next";
+import { NextApiResponse } from "next";
+import { serverSideAuthenticate } from "../lib/middleware/tokenAnalyse";
 
-interface HomeProps {
-  prixBitcoin: number;
-}
 
-export default function Home(props: HomeProps) {
+export default function Home() {
   const [competence, setCompetence] = useState(["MERN stack", "Javascript", "Typescript", "Node.js", "React", "Next.js", "Express", "MongoDB"]);
   const [competenceActuelle, setcompetenceActuelle] = useState(0);
   const [affichageCompetence, setaffichageCompetence] = useState("");
@@ -26,23 +27,39 @@ export default function Home(props: HomeProps) {
   }, [competenceActuelle, competence]);
 
   const phrase = `Je suis Développeur ${affichageCompetence}`;
-
   return (
     <>
-      <h1>Bienvenue sur mon site ! <br /> {phrase}</h1>
-      <p>Prix du Bitcoin : {props.prixBitcoin} €</p>
+      <Head>
+        <title>Développeur MERN Stack</title>
+      </Head>
+
+      <div className="container">
+        <div className="content">
+          <h1>Bienvenue sur mon site !</h1>
+          <h2>{phrase} !</h2>
+      
+        </div>
+      </div>
     </>
   );
 }
 
-export async function getStaticProps() {
-  let bitcoinEnEuro;
-  await fetch('https://blockchain.info/ticker')
-  .then(response => response.json())
-  .then(data => bitcoinEnEuro = data.EUR.last);
-  return {
-    props: {
-      prixBitcoin: bitcoinEnEuro
-    }
-  }
-}
+export const getServerSideProps = async (ctx: { req: MyNextApiRequest; res: NextApiResponse<any>; }) => {
+  // Vérifier l'authentification de l'utilisateur
+  await serverSideAuthenticate(ctx.req, ctx.res, () => {});
+
+  // Return empty object to prevent "did not return an object" error
+  return { props: {} };
+};
+
+// export async function getStaticProps() {
+//   let bitcoinEnEuro;
+//   await fetch('https://blockchain.info/ticker')
+//   .then(response => response.json())
+//   .then(data => bitcoinEnEuro = data.EUR.last);
+//   return {
+//     props: {
+//       prixBitcoin: bitcoinEnEuro
+//     }
+//   }
+// }

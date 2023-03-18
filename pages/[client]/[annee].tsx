@@ -44,9 +44,7 @@ export default function ProjetDuClientFiltre() {
               key={project.id}
               id={project.id}
               title={project.title}
-              urlImage={project.urlImage}
-              description={project.description}
-          
+              description={project.description} client={""} annee={0}          
             />
           ))}
         </div>
